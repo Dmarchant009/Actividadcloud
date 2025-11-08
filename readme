@@ -1,0 +1,53 @@
+
+# services es el contenedor principal para todos nuestros contenedores
+services:
+
+  # es para nuestro servicio de base de datos para la consistencia 
+  db:
+    # Define la imagen y versión que usara este contenedor
+    image: mariadb:11
+    
+    
+    
+    environment: # con environment definimos variables de entorno dentro del contenedor por ejemplo la contraseña 
+      
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wordpress
+      - MYSQL_PASSWORD=password123
+    # 'volumes' define el almacenamiento persistente para que los datos no se borren
+    volumes:
+      - wp_db:/var/lib/mysql #'wp_db' '/var/lib/mysql'
+    # restart es para el reinicio
+  
+    restart: unless-stopped   # unless-stopped reinicia el contenedor si falla
+
+  # servicio de wordpress
+  wordpress:
+    # definimos la imagen que usaremos de wordpress
+    image: wordpress:6-apache
+    
+    ports:    # port expone los puertos del contenedor 
+        - "8082:80"
+    # Variables de entorno que la imagen de WordPress necesita para conectarse a la bd que creamos arriba
+    environment:
+      
+      - WORDPRESS_DB_HOST=db
+      - WORDPRESS_DB_NAME=wordpress
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=password123
+      
+    # Almacenamiento persistente para los archivos de wordPress
+    volumes:
+      # Mapea el volumen 'wp_files' a la carpeta de instalación de wordpress con la ruta que le damos
+      - wp_files:/var/www/html
+
+    restart: unless-stopped     # politica de reinicio, igual que la base de datos
+
+# 'volumes' declara los volumenes creados anteriormente
+# es para que los datos queden 
+volumes:
+  # Declara el volumen que usará el servicio db
+  wp_db:
+  # Declara el volumen que usará el servicio wordpress
+  wp_files:

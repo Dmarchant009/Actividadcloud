@@ -1,0 +1,31 @@
+services:
+  db:
+    image: mariadb:11
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wordpress
+      - MYSQL_PASSWORD=password123
+    volumes:
+      - wp_db:/var/lib/mysql
+    restart: unless-stopped
+
+
+  wordpress:
+    image: wordpress:6-apache
+    ports:
+      - "8082:80"
+    environment:
+      - WORDPRESS_DB_HOST=db
+      - WORDPRESS_DB_NAME=wordpress
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=password123
+
+    volumes:
+      - wp_files:/var/www/html
+    restart: unless-stopped
+
+
+volumes:
+  wp_db:
+  wp_files:
